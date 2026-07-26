@@ -54,6 +54,22 @@ class ImageProcessor:
         self._ensure_gray()
         self.apply(transforms.adjust_contrast, factor)
         return self
+    
+    def blur(self, kernel_size=5, sigma=1.0):
+        """高斯模糊"""
+        self.apply(transforms.gaussian_blur, kernel_size, sigma)
+        return self
+
+    def sharpen(self, strength=1.0):
+        """锐化"""
+        self.apply(transforms.sharpen, strength)
+        return self
+
+    def canny(self, low=30, high=100):
+        """Canny边缘检测（自动转灰度）"""
+        self._ensure_gray()
+        self.apply(transforms.canny_edge, low, high)
+        return self
 
     def get_image(self):
         return self.current
