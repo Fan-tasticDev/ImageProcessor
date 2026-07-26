@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from PIL import Image
 
@@ -12,8 +13,13 @@ def load_image(path: str) -> np.ndarray:
 # 根据维度自动保存灰度或彩色图
 def save_image(arr: np.ndarray, path: str):
     """
-    将 numpy 数组保存为图片。自动处理灰度/彩色
+    将 numpy 数组保存为图片。自动创建不存在的目录。
     """
+    # 自动创建输出目录
+    output_dir = os.path.dirname(path)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+
     # 如果是二维灰度图，转为 PIL 'L' 模式
     if arr.ndim == 2:
         img = Image.fromarray(arr.astype(np.uint8), mode='L')

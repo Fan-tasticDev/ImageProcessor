@@ -119,4 +119,8 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"程序运行出错: {e}")
+        sys.exit(1)
