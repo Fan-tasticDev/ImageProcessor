@@ -175,3 +175,34 @@ def canny_edge(image: np.ndarray, low_threshold: float = 50, high_threshold: flo
             else:
                 edge_map[i, j] = 0
     return edge_map
+
+
+def histogram_equalization(gray_image: np.ndarray) -> np.ndarray:
+    """
+    对单通道灰度图进行直方图均衡化。
+    原理：重新映射像素值，使其累计分布函数呈线性，从而拉伸对比度。
+    """
+    if gray_image.ndim != 2:
+        raise ValueError("直方图均衡化仅支持单通道灰度图")
+    
+    # 计算直方图（256个bins，范围0-255）
+    hist, bins = np.histogram(gray_image.flatten(), bins=256, range=(0, 256))
+    
+    # 计算累积分布函数 (CDF) 并归一化到 0-255
+    cdf = hist.cumsum()
+    cdf_normalized = (cdf - cdf.min()) * 255 / (cdf.max() - cdf.min())
+    
+    # 用原始像素值作为索引，查找均衡化后的值
+    equalized = cdf_normalized[gray_image]
+    return equalized.astype(np.uint8)
+
+
+def plot_histogram(gray_image: np.ndarray, title: str = "Histogram"):
+    """绘制灰度直方图，返回 matplotlib figure 对象"""
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    ax.hist(gray_image.ravel(), bins=256, range=(0, 255), color='gray', alpha=0.7)
+    ax.set_title(title)
+    ax.set_xlabel("Pixel Intensity")
+    ax.set_ylabel("Frequency")
+    return fig

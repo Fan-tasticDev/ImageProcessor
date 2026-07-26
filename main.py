@@ -2,75 +2,71 @@ import matplotlib.pyplot as plt
 from utils.io import load_image, save_image
 from utils.processor import ImageProcessor
 
-
 def main():
     img_path = "images/test.jpg"
     original = load_image(img_path)
     proc = ImageProcessor(original)
 
-    # ---- 测试高斯模糊 ----
-    proc.blur(kernel_size=5, sigma=2)
-    blurred = proc.get_image()
-    save_image(blurred, "images/test_blur.jpg")
-    proc.reset()
-
-    # ---- 测试锐化 ----
-    proc.sharpen(strength=1.5)
-    sharpened = proc.get_image()
-    save_image(sharpened, "images/test_sharp.jpg")
-    proc.reset()
-
-    # ---- 测试Canny边缘检测 ----
-    proc.canny(low=50, high=150)
-    edges = proc.get_image()
-    save_image(edges, "images/test_canny.jpg")
-    proc.reset()
-
-    # ---- 可视化 ----
-    plt.figure(figsize=(12, 8))
-
-    plt.subplot(2, 3, 1)
-    plt.imshow(original)
-    plt.title("Original")
+    # 先转为灰度，保存用于对比
+    proc.to_gray()
+    gray_original = proc.get_image()
+    save_image(gray_original, "images/test_gray.jpg")
+    
+    # 直方图均衡化
+    proc.equalize_hist()
+    equalized = proc.get_image()
+    save_image(equalized, "images/test_equalized.jpg")
+    
+    # ---- 1. 图片对比：原灰度图 vs 均衡化图 ----
+    plt.figure(figsize=(10, 5))
+    
+    plt.subplot(1, 2, 1)
+    plt.imshow(gray_original, cmap="gray")
+    plt.title("Original Gray")
     plt.axis("off")
-
-    plt.subplot(2, 3, 2)
-    plt.imshow(blurred)
-    plt.title("Gaussian Blur sigma=2")
+    
+    plt.subplot(1, 2, 2)
+    plt.imshow(equalized, cmap="gray")
+    plt.title("Histogram Equalized")
     plt.axis("off")
-
-    plt.subplot(2, 3, 3)
-    plt.imshow(sharpened)
-    plt.title("Sharpen strength=1.5")
-    plt.axis("off")
-
-    plt.subplot(2, 3, 4)
-    plt.imshow(edges, cmap="gray")
-    plt.title("Canny Edges (50,150)")
-    plt.axis("off")
-
-    # 额外显示：原图转灰度后与边缘叠加
-    plt.subplot(2, 3, 5)
-    gray = proc.to_gray().get_image()
-    plt.imshow(gray, cmap="gray")
-    plt.title("Grayscale for comparison")
-    plt.axis("off")
-
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # ---- 2. 直方图对比 ----
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    
+    axes[0].hist(gray_original.ravel(), bins=256, range=(0,255), color='gray', alpha=0.7)
+    axes[0].set_title("Original Gray Histogram")
+    axes[0].set_xlabel("Pixel Intensity")
+    axes[0].set_ylabel("Frequency")
+    
+    axes[1].hist(equalized.ravel(), bins=256, range=(0,255), color='black', alpha=0.7)
+    axes[1].set_title("Equalized Histogram")
+    axes[1].set_xlabel("Pixel Intensity")
+    axes[1].set_ylabel("Frequency")
+    
     plt.tight_layout()
     plt.show()
 
-    # 实验：不同sigma的高斯模糊
+    # 模拟暗图：亮度设为原图的0.3倍
+    proc_dark = ImageProcessor(original)
+    proc_dark.brightness(0.3)
+    dark_img = proc_dark.get_image()
+    save_image(dark_img, "images/test_dark.jpg")
 
+    # 对暗图做均衡化
+    proc_dark.to_gray().equalize_hist()
+    dark_eq = proc_dark.get_image()
+    save_image(dark_eq, "images/test_dark_eq.jpg")
 
-    proc2 = ImageProcessor(original)
-    plt.figure(figsize=(10, 4))
-    for i, s in enumerate([0.5, 2, 4]):
-        proc2.reset()
-        proc2.blur(sigma=s)
-        plt.subplot(1, 3, i + 1)
-        plt.imshow(proc2.get_image())
-        plt.title(f"sigma={s}")
-        plt.axis("off")
+    plt.figure()
+    plt.subplot(1,2,1)
+    plt.imshow(dark_img, cmap='gray')
+    plt.title("Dark Image")
+    plt.subplot(1,2,2)
+    plt.imshow(dark_eq, cmap='gray')
+    plt.title("After Equalization")
     plt.show()
 
 if __name__ == "__main__":

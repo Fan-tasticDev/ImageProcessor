@@ -70,6 +70,12 @@ class ImageProcessor:
         self._ensure_gray()
         self.apply(transforms.canny_edge, low, high)
         return self
+    
+    def equalize_hist(self):
+        """直方图均衡化（自动转灰度）"""
+        self._ensure_gray()
+        self.apply(transforms.histogram_equalization)
+        return self
 
     def get_image(self):
         return self.current
