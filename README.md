@@ -74,3 +74,11 @@ ImageProcessor/
 ├── requirements.txt       # 依赖列表
 └── README.md
 ```
+
+# 实例图片
+![图像处理效果图1](./assets/view1.png)
+![图像处理效果图2](./assets/view2.png)
+![图像处理效果图3](./assets/view3.png)
+![图像处理效果图4](./assets/view4.png)
+![图像处理效果图5](./assets/view5.png)
+![图像处理效果图6](./assets/view6.png)
