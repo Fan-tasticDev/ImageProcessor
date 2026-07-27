@@ -3,6 +3,4 @@ __pycache__/
 *.pyc
 .vscode/
 images_output/
-*.jpg
-*.png
 !images/test.jpg
